@@ -76,7 +76,7 @@ exstack2_t * exstack2_init(int64_t buf_cnt, size_t pkg_size)
   
   XS2->s_num_msgs      = shmem_malloc(sizeof(int64_t));
   if(XS2->s_num_msgs   == NULL) return(NULL);
-  shmem_atomic_set(XS2->s_num_msgs, 0, MYTHREAD);
+  shmem_size_atomic_set(XS2->s_num_msgs, 0, MYTHREAD);
   XS2->l_num_msgs = lgp_local_part(int64_t, XS2->s_num_msgs);
   
   XS2->num_popped = 0L;
@@ -90,7 +90,7 @@ exstack2_t * exstack2_init(int64_t buf_cnt, size_t pkg_size)
   XS2->s_can_send = shmem_malloc((size_t)THREADS*sizeof(int64_t));
   if(XS2->s_can_send == NULL) return(NULL);
   for(i = 0; i < THREADS; i++)
-    shmem_atomic_set(&XS2->s_can_send[i], 1, MYTHREAD);
+    shmem_size_atomic_set(&XS2->s_can_send[i], 1, MYTHREAD);
 
   // allocate and initialize push and pop ptrs
   XS2->push_cnt = calloc(THREADS, sizeof(int64_t));
@@ -362,7 +362,7 @@ int64_t exstack2_pop(exstack2_t * Xstk2, void *pkg, int64_t *from_pe)
   //int64_t s2l_num_msgs = Xstk2->l_num_msgs[0];
   //#else
   // this is making exstack2 slow!
-  int64_t s2l_num_msgs = shmem_atomic_fetch(Xstk2->s_num_msgs, MYTHREAD);
+  int64_t s2l_num_msgs = shmem_size_atomic_fetch(Xstk2->s_num_msgs, MYTHREAD);
   //#endif
 
   
@@ -468,7 +468,7 @@ void *exstack2_pull(exstack2_t * Xstk2, int64_t *from_pe) // sets pointer to pkg
   //int64_t s2l_num_msgs = Xstk2->l_num_msgs[0];
   //#else
   // this is making exstack2 slow!
-  int64_t s2l_num_msgs = shmem_atomic_fetch(Xstk2->s_num_msgs, MYTHREAD);
+  int64_t s2l_num_msgs = shmem_size_atomic_fetch(Xstk2->s_num_msgs, MYTHREAD);
   //#endif
   //printf("%d got %ld messages %ld active\n", MYTHREAD, s2l_num_msgs, Xstk2->num_made_active);fflush(0);
   
